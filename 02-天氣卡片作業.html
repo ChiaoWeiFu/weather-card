@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #D9CD90;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .cards {
+            width: 1000px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card {
+            width: 25%;
+            height: 230px;
+            border: solid 1px rgba(0, 0, 230, 0.8);
+            margin: 15px;
+            padding-left: 10px;
+            color: khaki;
+            background-size: cover;
+            border-radius: 10px;
+            box-shadow: 0 15px 20px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+        }
+        .img img {
+            width: 100px;
+            height: 100px;
+        }
+
+        button {
+            width: 100px;
+            height: 50px;
+            margin: 200px 10px 0 10px;
+            background-color: #EFBB24;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.7);
+            color: blue;
+            font-size: 30px;
+            font-weight: 600;
+        }
+
+        button:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <button class="daybtn">白天</button>
+        <button class="nightbtn">晚上</button>
+        <div class="cards">
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="./js/vanilla-tilt.js"></script>
+    <script>
+        const cardsElement = document.querySelector('.cards');
+        let cards = '';
+        let sunny = './img/sunny.svg';
+        let sunnyCloudy = './img/sunnycloudy.svg';
+        let cloudy = './img/cloudy.svg';
+        let overcast = './img/overcast.svg';
+        let rainy = './img/rainy.svg';
+        let dayBtn = document.querySelector('.daybtn');
+        let nightBtn = document.querySelector('.nightbtn');
+        let url = 'https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=CWB-C14E7C1A-B48A-4733-90CE-ED4AFECF1CCD';
+        // 發送get請求
+        fetch(url)
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (data) {
+                // console.log(`${data['records']['location'][i]['locationName']}`);
+                // console.log(`${data['records']['location'][i]['weatherElement'][0]['time'][0]['parameter']['parameterName']}`)
+                // console.log(`降雨機率 ${data['records']['location'][i]['weatherElement'][1]['time'][0]['parameter']['parameterName']}%`)
+                // console.log(`氣溫 ${data['records']['location'][i]['weatherElement'][2]['time'][0]['parameter']['parameterName']} ~ ${data['records']['location'][i]['weatherElement'][4]['time'][0]['parameter']['parameterName']}`)
+                // console.log(`舒適度: ${data['records']['location'][i]['weatherElement'][3]['time'][0]['parameter']['parameterName']}`)
+                for (let i = 0; i < 22; i++) {
+                    let backgroundImgNum = Math.floor(Math.random() * 4) + 1;
+                    let wxDayValue = `${data['records']['location'][i]['weatherElement'][0]['time'][0]['parameter']['parameterValue']}`
+                    let wxNightValue = `${data['records']['location'][i]['weatherElement'][0]['time'][1]['parameter']['parameterValue']}`
+                    let wxImg = ''
+                    if (wxDayValue == 1) {
+                        wxImg = sunny
+                    } else if (wxDayValue < 4) {
+                        wxImg = sunnyCloudy
+                    } else if (wxDayValue < 7) {
+                        wxImg = cloudy
+                    } else if (wxDayValue < 8) {
+                        wxImg = overcast
+                    } else {
+                        wxImg = rainy
+                    }
+                    let wxDay = `${data['records']['location'][i]['weatherElement'][0]['time'][0]['parameter']['parameterName']}`;
+                    let wxNight = `${data['records']['location'][i]['weatherElement'][0]['time'][1]['parameter']['parameterName']}`;
+                    let rainDay = `降雨機率 ${data['records']['location'][i]['weatherElement'][1]['time'][0]['parameter']['parameterName']}%`;
+                    let rainNight = `降雨機率 ${data['records']['location'][i]['weatherElement'][1]['time'][1]['parameter']['parameterName']}%`;
+                    let temperatureDay = `氣溫 ${data['records']['location'][i]['weatherElement'][2]['time'][0]['parameter']['parameterName']} ~ ${data['records']['location'][i]['weatherElement'][4]['time'][0]['parameter']['parameterName']}`;
+                    let temperatureNight = `氣溫 ${data['records']['location'][i]['weatherElement'][2]['time'][1]['parameter']['parameterName']} ~ ${data['records']['location'][i]['weatherElement'][4]['time'][1]['parameter']['parameterName']}`;
+                    let feelingDay = `舒適度: ${data['records']['location'][i]['weatherElement'][3]['time'][0]['parameter']['parameterName']}`;
+                    let feelingNight = `舒適度: ${data['records']['location'][i]['weatherElement'][3]['time'][1]['parameter']['parameterName']}`;
+                    let cityNumber = `city${i}`
+                    cards +=
+                        `
+                            <div id="${cityNumber}" class="card" style="background-image:url('./img/visa-bg-${backgroundImgNum}.jpg";)>
+                                <div class="img" >
+                                    <img src="${wxImg}" alt="">
+                                </div>
+                                <div class="city">${data['records']['location'][i]['locationName']}</div>
+                                <div class="wx">${data['records']['location'][i]['weatherElement'][0]['time'][0]['parameter']['parameterName']}</div>
+                                <div class="rain">降雨機率 ${data['records']['location'][i]['weatherElement'][1]['time'][0]['parameter']['parameterName']}%</div>
+                                <div class="temperature">氣溫 ${data['records']['location'][i]['weatherElement'][2]['time'][0]['parameter']['parameterName']} ~ ${data['records']['location'][i]['weatherElement'][4]['time'][0]['parameter']['parameterName']}</div>
+                                <div class="feeling">舒適度: ${data['records']['location'][i]['weatherElement'][3]['time'][0]['parameter']['parameterName']}</div>
+                            </div>
+                        `;
+                }
+                cardsElement.innerHTML = cards;
+            })
+            .then(function () {
+                VanillaTilt.init(document.querySelectorAll(".card"), {
+                    max: 25,
+                    speed: 400,
+                    glare: true,
+                    "max-glare": 1,
+                    scale: 1.2,
+                });
+            })
+            .then(function () {
+                document.getElementById("city0").style.order = 13;
+                document.getElementById("city1").style.order = 3;
+                document.getElementById("city2").style.order = 12;
+                document.getElementById("city3").style.order = 6;
+                document.getElementById("city4").style.order = 5;
+                document.getElementById("city5").style.order = 2;
+                document.getElementById("city6").style.order = 14;
+                document.getElementById("city7").style.order = 17;
+                document.getElementById("city8").style.order = 7;
+                document.getElementById("city9").style.order = 11;
+                document.getElementById("city10").style.order = 18;
+                document.getElementById("city11").style.order = 8;
+                document.getElementById("city12").style.order = 19;
+                document.getElementById("city13").style.order = 4;
+                document.getElementById("city14").style.order = 10;
+                document.getElementById("city15").style.order = 15;
+                document.getElementById("city16").style.order = 21;
+                document.getElementById("city17").style.order = 16;
+                document.getElementById("city18").style.order = 1;
+                document.getElementById("city19").style.order = 20;
+                document.getElementById("city20").style.order = 9;
+                document.getElementById("city21").style.order = 22;
+            })
+    </script>
+</body>
+
+</html>
